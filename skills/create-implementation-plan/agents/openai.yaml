@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Implementation Plan"
+  short_description: "Turn approved design into execution-ready steps"
+  default_prompt: "Use $create-implementation-plan to convert this design into an actionable implementation sequence."

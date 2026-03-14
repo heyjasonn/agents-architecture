@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Go Code"
+  short_description: "Review Go code with senior-level rigor"
+  default_prompt: "Use $review-go-code to review this Go code thoroughly and provide prioritized findings."

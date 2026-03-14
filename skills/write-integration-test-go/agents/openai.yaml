@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Integration Test Go"
+  short_description: "Write deterministic Go integration tests"
+  default_prompt: "Use $write-integration-test-go to write Go integration tests for DB, queue, and external integrations."

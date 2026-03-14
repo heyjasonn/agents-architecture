@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Unit Test Go"
+  short_description: "Write robust Go unit tests with clear intent"
+  default_prompt: "Use $write-unit-test-go to write Go unit tests for this code following project testing conventions."

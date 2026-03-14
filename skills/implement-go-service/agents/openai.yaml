@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Go Service"
+  short_description: "Implement Go business service layer logic"
+  default_prompt: "Use $implement-go-service to implement business logic in the Go service layer following project conventions."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze Requirement"
+  short_description: "Turn business specs into actionable technical tasks"
+  default_prompt: "Use $analyze-requirement to break this PRD into implementation-ready technical tasks."

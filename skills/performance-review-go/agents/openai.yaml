@@ -1,0 +1,4 @@
+interface:
+  display_name: "Performance Review Go"
+  short_description: "Review and optimize Go performance risks"
+  default_prompt: "Use $performance-review-go to review this Go code for performance bottlenecks and optimization opportunities."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement External Integration"
+  short_description: "Implement resilient external service integrations"
+  default_prompt: "Use $implement-external-integration to implement integration with external services following reliability and security conventions."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Review Backend"
+  short_description: "Assess backend code for practical security risk"
+  default_prompt: "Use $security-review-backend to run a security-focused review of this backend change."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Case Generator Backend"
+  short_description: "Generate backend test case checklists"
+  default_prompt: "Use $test-case-generator-backend to generate a comprehensive backend test case checklist from this feature requirement."

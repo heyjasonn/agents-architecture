@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design API Contract"
+  short_description: "Define stable backend request/response contracts"
+  default_prompt: "Use $design-api-contract to design the request/response and error contract for this endpoint."

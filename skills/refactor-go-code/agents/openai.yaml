@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor Go Code"
+  short_description: "Refactor Go code without behavior changes"
+  default_prompt: "Use $refactor-go-code to refactor this Go code while preserving behavior and improving maintainability."

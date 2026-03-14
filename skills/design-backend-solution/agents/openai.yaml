@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Backend Solution"
+  short_description: "Design backend solutions from requirements"
+  default_prompt: "Use $design-backend-solution to propose an implementation-ready backend design from this requirement."

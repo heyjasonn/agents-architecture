@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design DB Migration"
+  short_description: "Design safe and reversible DB migrations"
+  default_prompt: "Use $design-db-migration to design a safe database migration plan for this change."
