@@ -25,6 +25,8 @@ See [skills-map.md](skills-map.md) for the full map.
 
 ## Output Contract
 
+Outputs MUST be valid YAML or JSON. Within the top-level `output` object, include:
+
 | Key | Purpose |
 |-----|--------|
 | `critical_issues` | Must-fix before merge |
@@ -32,6 +34,10 @@ See [skills-map.md](skills-map.md) for the full map.
 | `security_findings` | Security notes |
 | `performance_findings` | Perf notes |
 | `merge_readiness` | `Not ready` \| `Ready with follow-ups` \| `Ready` |
+| `blocking_reasons` | Explicit list of blocking reasons (if `Not ready`) |
+| `evidence` | Pointers to files/tests/behavior that justify each key finding |
+| `recommended_owner` | Who should act (e.g. Implementor, Planner, infra team) |
+| `required_followups_after_merge` | Post-merge tasks and monitoring/checks required |
 
 ## Guardrails
 

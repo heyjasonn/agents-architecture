@@ -27,6 +27,8 @@ See [skills-map.md](skills-map.md) for the full map.
 
 ## Output Contract
 
+Outputs MUST be valid YAML or JSON. Within the top-level `output` object, include:
+
 | Key | Purpose |
 |-----|--------|
 | `changed_files` | List of modified paths |
@@ -34,6 +36,10 @@ See [skills-map.md](skills-map.md) for the full map.
 | `known_limitations` | Documented limits |
 | `areas_needing_tests` | Gaps for Tester |
 | `integration_points` | External/cross-service touchpoints |
+| `tests_required_before_review` | Boolean + brief explanation if tests are missing or incomplete |
+| `migrations_applied` | Any DB migrations or schema changes applied (or `none`) |
+| `config_changes` | Config/feature flag changes (keys, defaults, rollout notes) |
+| `feature_flags_used` | Feature flags involved and intended rollout strategy |
 
 ## Guardrails
 

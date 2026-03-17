@@ -25,12 +25,16 @@ See [skills-map.md](skills-map.md) for the full map.
 
 ## Output Contract
 
+Outputs MUST be valid YAML or JSON. Within the top-level `output` object, include:
+
 | Key | Purpose |
 |-----|--------|
 | `tests_added` | Files and cases added |
 | `covered_scenarios` | What is tested |
 | `uncovered_scenarios` | Gaps |
 | `observed_risks` | Residual risk notes |
+| `test_matrix` | Matrix over `unit`, `integration`, `e2e` (if applicable), `concurrency`, `rollback/migration`, `performance_smoke`, `security_regression` |
+| `regression_risk_level` | `low` \| `medium` \| `high` with a short justification |
 
 ## Guardrails
 

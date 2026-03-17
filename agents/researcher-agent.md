@@ -25,6 +25,8 @@ See [skills-map.md](skills-map.md) for the full map.
 
 ## Output Contract
 
+Outputs MUST be valid YAML or JSON. Within the top-level `output` object, include:
+
 | Key | Purpose |
 |-----|--------|
 | `problem_summary` | One-paragraph scope |
@@ -32,9 +34,12 @@ See [skills-map.md](skills-map.md) for the full map.
 | `impacted_components` | Files/modules touched |
 | `dependencies` | Internal/external deps |
 | `edge_cases` | Boundary and failure cases |
-| `risks` | Technical/product risks |
+| `risks` | Technical/product risks (with severity) |
 | `open_questions` | Blockers or assumptions |
 | `test_scenarios` | Initial scenario list |
+| `facts` | Items known to be true from source material |
+| `assumptions` | Explicit assumptions; each with `reason` and `risk_level` |
+| `risk_summary` | Optional rubric (e.g. counts by severity) |
 
 ## Guardrails
 

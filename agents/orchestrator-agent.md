@@ -14,16 +14,34 @@ Assigns a requirement to role agents (Researcher → Planner → Implementor →
 - **Does:** Delegation plan and control flow only.
 - **Does not:** Implement code; design architecture from scratch; return final merge decision outside Reviewer schema.
 
-## Input Contract
+## Runtime Contract
 
-| Key | Purpose |
-|-----|--------|
-| `requirement` | Raw user requirement/spec text |
-| `category` | Optional; see canonical categories below |
-| `context` | Optional implementation context |
-| `handoff_outputs` | Outputs from completed agents when available |
+The orchestrator always reads and writes **structured artifacts**, not free-form prose.
 
-## Categories and Aliases
+### Input Contract (task-level)
+
+Top-level object:
+
+```yaml
+task_id: "<string>"
+requirement: "<raw spec text>"
+category: "<optional; see canonical categories>" # may be null
+context: {}                                     # optional implementation context (e.g. repo, stack)
+state: {}                                       # shared state object; see AGENTS.md State model
+handoff_outputs:                                # optional, prior agent outputs keyed by role
+  researcher: {...}
+  planner: {...}
+  implementor: {...}
+  tester: {...}
+  reviewer: {...}
+```
+
+If `category` is missing or `null`, Orchestrator should:
+
+- Route to Researcher first, asking it to classify category in its output.
+- Persist the chosen category in subsequent state.
+
+### Categories and Aliases
 
 **Canonical:** `new-feature` | `bugfix` | `db-change` | `external-integration` | `other`
 
@@ -60,6 +78,16 @@ If requirement is out-of-scope (e.g. infra redesign, cross-system architecture, 
 
 ## Output Artifacts (by step)
 
+Each role MUST return **strict YAML or JSON** with:
+
+- Top-level `task_id`
+- Top-level `agent` (e.g. `researcher`, `planner`)
+- Top-level `version` (integer; increment when that role re-runs)
+- Top-level `output` object with keys below
+- Optional `meta` object (eval metrics, timings, token usage, tools used)
+
+Within `output`, required keys by step:
+
 | Step | Required keys (from role spec) |
 |------|-------------------------------|
 | Researcher | `problem_summary`, `requirements`, `impacted_components`, `dependencies`, `edge_cases`, `risks`, `open_questions`, `test_scenarios` |
@@ -68,11 +96,52 @@ If requirement is out-of-scope (e.g. infra redesign, cross-system architecture, 
 | Tester | `tests_added`, `covered_scenarios`, `uncovered_scenarios`, `observed_risks` |
 | Reviewer | `critical_issues`, `improvements`, `security_findings`, `performance_findings`, `merge_readiness` |
 
+## Context forwarding and pruning
+
+The orchestrator must **prune** context to only what the next role needs:
+
+- **Researcher → Planner**
+  - Forward: Researcher `output` only (plus `requirement` text).
+  - Do not forward raw logs, previous traces, or entire repo summaries.
+- **Planner → Implementor**
+  - Forward: Researcher + Planner `output`; minimal repo metadata and file paths.
+- **Implementor → Tester**
+  - Forward: Planner + Implementor `output`; requirement text; relevant file paths.
+- **Tester → Reviewer**
+  - Forward: Planner + Implementor + Tester `output`; requirement text.
+
+For all steps, keep a separate internal log/trace store; do **not** embed large history in the agent prompt unless required for correctness.
+
 ## Quality Gates
 
 - No step advances without required output keys.
-- Open questions must be resolved or marked for follow-up before drop.
+- Open questions must be resolved or explicitly marked for follow-up before step completion.
 - Loopbacks include source, blocking issue, acceptance condition.
+
+## Retry and validation policy
+
+- **Schema validation:**
+  - On parse or schema failure: emit a **single** auto-reprompt to the same agent with a brief correction describing the exact schema error.
+  - If the second attempt fails, mark `current_status = blocked` and return a `manual_handoff` artifact.
+- **Retries:**
+  - Default `max_retries_per_step = 1` (1 original + 1 correction).
+  - The orchestrator may override per-category if needed, but should avoid infinite loops.
+
+## Parallelism policy
+
+- Default execution is **sequential** along the baseline chain.
+- Parallelism is allowed only for:
+  - Independent sub-requirements (e.g. multiple unrelated endpoints).
+  - Non-conflicting test suites once implementation is stable.
+- The orchestrator must avoid running two roles concurrently on the **same** `task_id` and `plan_version`.
+
+## Escalation to human
+
+The orchestrator should emit a `manual_handoff` artifact and stop delegation when:
+
+- The requirement is out-of-scope for this pipeline (see `unsupported` examples).
+- Schema validation fails twice for the same step.
+- A role signals a blocking risk that cannot be resolved by another role (e.g. destructive migration without rollback path).
 
 ## Validation Examples
 

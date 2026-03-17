@@ -26,6 +26,8 @@ See [skills-map.md](skills-map.md) for the full map.
 
 ## Output Contract
 
+Outputs MUST be valid YAML or JSON. Within the top-level `output` object, include:
+
 | Key | Purpose |
 |-----|--------|
 | `architecture_overview` | High-level flow |
@@ -35,6 +37,9 @@ See [skills-map.md](skills-map.md) for the full map.
 | `implementation_steps` | Ordered tasks |
 | `constraints` | Technical limits |
 | `assumptions` | Design assumptions |
+| `non_functional_requirements` | Latency, reliability, observability, security, scalability where relevant |
+| `backward_compatibility` | How backward compatibility is maintained or why it is waived |
+| `rollback_strategy` | How to undo changes safely (especially DB and external integrations) |
 
 ## Guardrails
 
