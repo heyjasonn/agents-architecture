@@ -86,15 +86,15 @@ Each role MUST return **strict YAML or JSON** with:
 - Top-level `output` object with keys below
 - Optional `meta` object (eval metrics, timings, token usage, tools used)
 
-Within `output`, required keys by step:
+Within `output`, required keys by step (see each role spec for full descriptions):
 
 | Step | Required keys (from role spec) |
 |------|-------------------------------|
-| Researcher | `problem_summary`, `requirements`, `impacted_components`, `dependencies`, `edge_cases`, `risks`, `open_questions`, `test_scenarios` |
-| Planner | `architecture_overview`, `request_flow`, `api_contract`, `db_changes`, `implementation_steps`, `constraints`, `assumptions` |
-| Implementor | `changed_files`, `implemented_rules`, `known_limitations`, `areas_needing_tests`, `integration_points` |
-| Tester | `tests_added`, `covered_scenarios`, `uncovered_scenarios`, `observed_risks` |
-| Reviewer | `critical_issues`, `improvements`, `security_findings`, `performance_findings`, `merge_readiness` |
+| Researcher | `problem_summary`, `requirements`, `impacted_components`, `dependencies`, `edge_cases`, `risks`, `open_questions`, `test_scenarios`, `facts`, `assumptions`, `risk_summary` |
+| Planner | `architecture_overview`, `request_flow`, `api_contract`, `db_changes`, `implementation_steps`, `constraints`, `assumptions`, `non_functional_requirements`, `backward_compatibility`, `rollback_strategy` |
+| Implementor | `changed_files`, `implemented_rules`, `known_limitations`, `areas_needing_tests`, `integration_points`, `tests_required_before_review`, `migrations_applied`, `config_changes`, `feature_flags_used` |
+| Tester | `tests_added`, `covered_scenarios`, `uncovered_scenarios`, `observed_risks`, `test_matrix`, `regression_risk_level` |
+| Reviewer | `critical_issues`, `improvements`, `security_findings`, `performance_findings`, `merge_readiness`, `blocking_reasons`, `evidence`, `recommended_owner`, `required_followups_after_merge` |
 
 ## Context forwarding and pruning
 
