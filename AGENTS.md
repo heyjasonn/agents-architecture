@@ -9,6 +9,9 @@ This repo defines a **multi-agent pipeline** (requirements → research → plan
 - **Skills map:** `agents/skills-map.md` — which skills each agent uses (e.g. `implement-go-handler`, `write-unit-test-go`).
 - **Examples:** `agents/examples.md` — full pipeline walkthroughs (new feature, bugfix, loopback).
 - **Agent specs meta:** `agents/README.md` — standards, verification checklist, file map.
+- **State model:** `agents/state-model.md` — shared state, versioning, blocking issues.
+- **Evals:** `agents/evals.md` — role-level eval rubrics and metrics.
+- **Observability:** `agents/observability.md` — traces, logs, run metadata.
 
 ### Runtime model
 
