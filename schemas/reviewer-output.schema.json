@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/reviewer-output.schema.json",
+  "title": "ReviewerArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "agent", "version", "output"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "agent": { "const": "reviewer" },
+    "version": { "type": "integer", "minimum": 1 },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "critical_issues",
+        "improvements",
+        "security_findings",
+        "performance_findings",
+        "merge_readiness"
+      ],
+      "properties": {
+        "critical_issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "improvements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "security_findings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "performance_findings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "merge_readiness": {
+          "type": "string",
+          "enum": ["Not ready", "Ready with follow-ups", "Ready"]
+        },
+        "blocking_reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "recommended_owner": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "required_followups_after_merge": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
+

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/implementor-output.schema.json",
+  "title": "ImplementorArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "agent", "version", "output"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "agent": { "const": "implementor" },
+    "version": { "type": "integer", "minimum": 1 },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed_files",
+        "implemented_rules",
+        "known_limitations",
+        "areas_needing_tests",
+        "integration_points"
+      ],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "implemented_rules": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "known_limitations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "areas_needing_tests": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "integration_points": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tests_required_before_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value"],
+          "properties": {
+            "value": { "type": "boolean" },
+            "explanation": { "type": "string" }
+          }
+        },
+        "migrations_applied": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "config_changes": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "feature_flags_used": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
+

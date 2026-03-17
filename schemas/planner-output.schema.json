@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/planner-output.schema.json",
+  "title": "PlannerArtifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "agent", "version", "output"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "agent": { "const": "planner" },
+    "version": { "type": "integer", "minimum": 1 },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "architecture_overview",
+        "request_flow",
+        "api_contract",
+        "db_changes",
+        "implementation_steps",
+        "constraints",
+        "assumptions"
+      ],
+      "properties": {
+        "architecture_overview": { "type": "string" },
+        "request_flow": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "api_contract": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "db_changes": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "implementation_steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "non_functional_requirements": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "backward_compatibility": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "rollback_strategy": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
+

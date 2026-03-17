@@ -1,6 +1,8 @@
-# Skills map: agents → skills
+## Skills map: agents → skills
 
 Each agent invokes one or more **skills** to fulfill its responsibilities. Skills are discrete capabilities (e.g. Cursor skills, MCP tools, or internal procedures). This map defines which skills each agent uses.
+
+### Summary (by agent)
 
 | Agent | Skills |
 |-------|--------|
@@ -9,6 +11,26 @@ Each agent invokes one or more **skills** to fulfill its responsibilities. Skill
 | **Implementor** | `implement-go-handler`, `implement-go-service`, `implement-go-repository`, `implement-external-integration` |
 | **Tester** | `write-unit-test-go`, `write-integration-test-go` |
 | **Reviewer** | `review-go-code`, `security-review-backend`, `performance-review-go` |
+
+### Permissions (per skill)
+
+| Skill | Agent(s) | Mode | Side effects | Approval required |
+|-------|----------|------|--------------|-------------------|
+| `analyze-requirement` | Researcher | read-only | none | no |
+| `test-case-generator-backend` | Researcher | read-only | none | no |
+| `design-backend-solution` | Planner | read-only | none | no |
+| `design-api-contract` | Planner | read-only | none | no |
+| `design-db-migration` | Planner | read-only | none | no |
+| `create-implementation-plan` | Planner | read-only | none | no |
+| `implement-go-handler` | Implementor | write | code changes | sometimes (new endpoints or breaking changes) |
+| `implement-go-service` | Implementor | write | code changes | sometimes (business logic changes) |
+| `implement-go-repository` | Implementor | write | code + data access changes | yes (when affecting persistence/queries) |
+| `implement-external-integration` | Implementor | write | external side effects (HTTP, webhooks, etc.) | yes (new integration or side effects) |
+| `write-unit-test-go` | Tester | write | code changes (tests only) | no |
+| `write-integration-test-go` | Tester | write | code + external systems in test env | sometimes (when touching real infra) |
+| `review-go-code` | Reviewer | read-only | none | no |
+| `security-review-backend` | Reviewer | read-only | none | no |
+| `performance-review-go` | Reviewer | read-only | none | no |
 
 ## By agent
 

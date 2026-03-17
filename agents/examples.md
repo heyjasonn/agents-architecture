@@ -20,39 +20,60 @@ Concrete examples of how a requirement flows through Researcher → Planner → 
 
 **Input:** Raw requirement + repo context (e.g. "Go service, `internal/` for domain, `api/` for HTTP handlers").
 
-**Output (handoff to Planner):**
+**Output (handoff to Planner, full artifact envelope):**
 
 ```yaml
-problem_summary: |
-  Need an HTTP endpoint to export customers as CSV with optional query filters
-  (date range, status). Backend-only; no UI in scope.
+task_id: "T-EXPORT-001"
+agent: "researcher"
+version: 1
 
-requirements:
-  - Export endpoint returns CSV of customers.
-  - Optional query params: date_from, date_to, status (active/inactive/all).
-  - Default: all customers if no filters. Pagination out of scope for v1.
+output:
+  problem_summary: |
+    Need an HTTP endpoint to export customers as CSV with optional query filters
+    (date range, status). Backend-only; no UI in scope.
 
-impacted_components:
-  - api/handlers/ (new or existing export handler)
-  - internal/customer/ (list/query logic)
-  - config (if new route or middleware)
+  requirements:
+    - Export endpoint returns CSV of customers.
+    - Optional query params: date_from, date_to, status (active/inactive/all).
+    - Default: all customers if no filters. Pagination out of scope for v1.
 
-dependencies: []
+  impacted_components:
+    - api/handlers/ (new or existing export handler)
+    - internal/customer/ (list/query logic)
+    - config (if new route or middleware)
 
-edge_cases:
-  - Empty result: return 200 with header-only CSV.
-  - Invalid date range: 400 with clear error.
-  - Invalid status value: 400.
+  dependencies: []
 
-risks:
-  - Large exports could strain memory; consider streaming or limit later.
+  edge_cases:
+    - Empty result: return 200 with header-only CSV.
+    - Invalid date range: 400 with clear error.
+    - Invalid status value: 400.
 
-open_questions: []
+  risks:
+    - description: "Large exports could strain memory; consider streaming or limit later."
+      severity: "medium"
+      area: "performance"
 
-test_scenarios:
-  - Happy path: valid filters, non-empty CSV.
-  - No filters: all customers.
-  - Empty result, invalid params, invalid status.
+  open_questions: []
+
+  test_scenarios:
+    - "Happy path: valid filters, non-empty CSV."
+    - "No filters: all customers."
+    - "Empty result, invalid params, invalid status."
+
+  facts:
+    - "Service is written in Go."
+
+  assumptions:
+    - statement: "Customer model has created_at and status fields."
+      reason: "Inferred from existing list endpoint."
+      risk_level: "medium"
+
+meta:
+  eval:
+    requirement_completeness_score: 0.9
+    risk_coverage_score: 0.8
+    open_questions_blocking: false
 ```
 
 ---
