@@ -44,7 +44,7 @@ meta:
 - **`risk_coverage_score`**
   - Measures how well `risks` cover performance, security, data correctness, and operational risk.
 - **`open_questions_blocking`**
-  - `true`: Planner should not proceed; orchestrator should loop back or escalate.
+  - `true`: Planner should not publish `execution_spec`; orchestrator should loop back or escalate.
 
 ---
 
@@ -53,17 +53,17 @@ meta:
 ```yaml
 meta:
   eval:
-    backward_compatibility_checked: true|false
+    execution_spec_complete: true|false
     rollback_strategy_present: true|false
     non_functional_constraints_covered: true|false
 ```
 
-- **`backward_compatibility_checked`**
-  - `true`: `backward_compatibility` section is present and explicit.
+- **`execution_spec_complete`**
+  - `true`: `execution_spec` includes functional requirements, business rules, edge cases, acceptance criteria, test scenarios, and rollout/rollback.
 - **`rollback_strategy_present`**
-  - `true`: `rollback_strategy` is present and realistic.
+  - `true`: `execution_spec.rollout_and_rollback` is present and realistic.
 - **`non_functional_constraints_covered`**
-  - `true`: `non_functional_requirements` covers latency, observability, security, and scalability where relevant.
+  - `true`: `execution_spec.non_functional_requirements` covers latency, observability, security, and scalability where relevant.
 
 ---
 
@@ -72,11 +72,11 @@ meta:
 ```yaml
 meta:
   eval:
-    changed_files_aligned_with_plan: true|false
+    changed_files_aligned_with_execution_spec: true|false
 ```
 
-- **`changed_files_aligned_with_plan`**
-  - `true`: `changed_files` correspond to components described in Planner `implementation_steps` / `impacted_components`.
+- **`changed_files_aligned_with_execution_spec`**
+  - `true`: `changed_files` correspond to components and constraints described in `execution_spec`.
   - If `false`: orchestrator may send a loopback to Planner or require manual review.
 
 ---
@@ -91,7 +91,7 @@ meta:
 ```
 
 - **`critical_scenarios_covered`**
-  - `true`: All critical flows identified by Researcher/Planner are in `covered_scenarios`.
+  - `true`: All critical flows identified in `execution_spec.acceptance_criteria`, `execution_spec.business_rules`, and `execution_spec.edge_cases` are in `covered_scenarios`.
   - `false`: Orchestrator should treat as a potential block before Reviewer.
 - **`regression_risk_level`**
   - `low`: Minimal behavior change or strong regression coverage.

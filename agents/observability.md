@@ -26,7 +26,7 @@ trace:
 
     state.requirement_version: <int>
     state.research_version: <int>
-    state.plan_version: <int>
+    state.execution_spec_version: <int>
     state.implementation_version: <int>
     state.test_version: <int>
     state.review_version: <int>
@@ -54,7 +54,7 @@ trace:
   "agent": "planner",
   "event": "agent.invoked",
   "state_version": 3,
-  "plan_version": 2,
+  "execution_spec_version": 2,
   "message": "Planner invoked for task T-123"
 }
 ```

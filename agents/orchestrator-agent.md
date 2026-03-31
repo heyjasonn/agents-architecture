@@ -7,7 +7,7 @@ description: Assigns requirements to role agents, enforces handoff order, and de
 
 ## Mission
 
-Assigns a requirement to role agents (Researcher → Planner → Implementor → Tester → Reviewer), enforces handoff order, and decides when loops/escalations are required.
+Assigns a requirement to role agents (Researcher → Planner → Implementor → Tester → Reviewer), enforces spec-first handoff order, and decides when loops/escalations are required.
 
 ## Decision Boundary
 
@@ -51,7 +51,7 @@ If `category` is missing or `null`, Orchestrator should:
 
 `researcher → planner → implementor → tester → reviewer`
 
-All categories use this unless a conditional rule adds checks or loopback policy.
+All categories use this unless a conditional rule adds checks or loopback policy. Planner must produce an `execution_spec` before Implementor can run.
 
 ## Conditional Rules by Category
 
@@ -66,6 +66,7 @@ All categories use this unless a conditional rule adds checks or loopback policy
 | From → To | When |
 |-----------|------|
 | Planner → Researcher | Missing impacted components; unclear domain; open questions block design |
+| Implementor → Planner | `execution_spec` incomplete or ambiguous; blocker-level open questions remain |
 | Tester → Implementor | Critical scenario untested; high test risk without mitigation; behavior mismatch |
 | Reviewer → Planner | API/schema ambiguity; architecture-level safety gaps |
 | Reviewer → Implementor | Local defects; unsafe patterns; missing guardrails |
@@ -88,10 +89,12 @@ Each role MUST return **strict YAML or JSON** with:
 
 Within `output`, required keys by step (see each role spec for full descriptions):
 
+`execution_spec` is a required artifact for this pipeline; no implementation may begin without an approved `execution_spec`.
+
 | Step | Required keys (from role spec) |
 |------|-------------------------------|
 | Researcher | `problem_summary`, `requirements`, `impacted_components`, `dependencies`, `edge_cases`, `risks`, `open_questions`, `test_scenarios`, `facts`, `assumptions`, `risk_summary` |
-| Planner | `architecture_overview`, `request_flow`, `api_contract`, `db_changes`, `implementation_steps`, `constraints`, `assumptions`, `non_functional_requirements`, `backward_compatibility`, `rollback_strategy` |
+| Planner | `execution_spec` with: `overview`, `scope`, `functional_requirements`, `business_rules`, `edge_cases`, `acceptance_criteria`, `test_scenarios`, `non_functional_requirements`, `rollout_and_rollback`, `open_questions`, `implementation_plan` |
 | Implementor | `changed_files`, `implemented_rules`, `known_limitations`, `areas_needing_tests`, `integration_points`, `tests_required_before_review`, `migrations_applied`, `config_changes`, `feature_flags_used` |
 | Tester | `tests_added`, `covered_scenarios`, `uncovered_scenarios`, `observed_risks`, `test_matrix`, `regression_risk_level` |
 | Reviewer | `critical_issues`, `improvements`, `security_findings`, `performance_findings`, `merge_readiness`, `blocking_reasons`, `evidence`, `recommended_owner`, `required_followups_after_merge` |
@@ -104,18 +107,21 @@ The orchestrator must **prune** context to only what the next role needs:
   - Forward: Researcher `output` only (plus `requirement` text).
   - Do not forward raw logs, previous traces, or entire repo summaries.
 - **Planner → Implementor**
-  - Forward: Researcher + Planner `output`; minimal repo metadata and file paths.
+  - Forward: Planner `output.execution_spec` (primary) + minimal supporting context (required file paths/constraints only).
 - **Implementor → Tester**
-  - Forward: Planner + Implementor `output`; requirement text; relevant file paths.
+  - Forward: Planner `output.execution_spec` (primary) + Implementor `output`; minimal supporting context only.
 - **Tester → Reviewer**
-  - Forward: Planner + Implementor + Tester `output`; requirement text.
+  - Forward: Planner `output.execution_spec` (primary) + Implementor + Tester `output`; minimal supporting context only.
 
 For all steps, keep a separate internal log/trace store; do **not** embed large history in the agent prompt unless required for correctness.
 
 ## Quality Gates
 
 - No step advances without required output keys.
-- Open questions must be resolved or explicitly marked for follow-up before step completion.
+- No downstream execution starts without an approved `execution_spec`.
+- Planner output must include `execution_spec.functional_requirements`, `execution_spec.business_rules`, `execution_spec.acceptance_criteria`, and `execution_spec.edge_cases`.
+- `execution_spec.open_questions` must contain no blocker-level ambiguity before Implementor starts.
+- If `execution_spec` is incomplete or ambiguous, loop back to Planner.
 - Loopbacks include source, blocking issue, acceptance condition.
 
 ## Retry and validation policy
@@ -133,7 +139,7 @@ For all steps, keep a separate internal log/trace store; do **not** embed large 
 - Parallelism is allowed only for:
   - Independent sub-requirements (e.g. multiple unrelated endpoints).
   - Non-conflicting test suites once implementation is stable.
-- The orchestrator must avoid running two roles concurrently on the **same** `task_id` and `plan_version`.
+- The orchestrator must avoid running two roles concurrently on the **same** `task_id` and `execution_spec_version`.
 
 ## Escalation to human
 

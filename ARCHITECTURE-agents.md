@@ -41,7 +41,7 @@ state:
 
   requirement_version: 1
   research_version: 0
-  plan_version: 0
+  execution_spec_version: 0
   implementation_version: 0
   test_version: 0
   review_version: 0
@@ -50,7 +50,7 @@ state:
 
   blocking_issues:
     - from_agent: "tester"
-      description: "Invalid status returns 500, plan says 400"
+      description: "Invalid status returns 500, execution spec says 400"
       acceptance_condition: "Handler returns 400 with test covering invalid status"
 
   acceptance_conditions:
@@ -168,68 +168,44 @@ agent: "planner"
 version: 1
 
 output:
-  architecture_overview: |
-    New GET handler parses query params, calls domain ListWithFilters,
-    streams CSV to response using existing auth middleware.
-
-  request_flow:
-    - "Parse query (date_from, date_to, status)"
-    - "Validate parameters"
-    - "Call customer.ListWithFilters(ctx, filters)"
-    - "Stream CSV to response"
-
-  api_contract:
-    method: "GET"
-    path: "/api/customers/export"
-    query_params:
-      date_from: { type: "string", format: "date", required: false }
-      date_to: { type: "string", format: "date", required: false }
-      status: { type: "string", enum: ["active", "inactive", "all"], required: false }
-    responses:
-      "200":
-        content_type: "text/csv"
-      "400":
-        reason: "Validation error"
-      "500":
-        reason: "Internal error"
-
-  db_changes:
-    migrations: []                 # or list of migration specs
-
-  implementation_steps:
-    - "Add ListWithFilters to customer service"
-    - "Add export handler and route"
-    - "Wire validation and CSV writer"
-
-  constraints:
-    - "Reuse existing auth middleware"
-    - "No new tables"
-
-  assumptions:
-    - "Customer repository already supports filtering by status"
-
-  non_functional_requirements:
-    latency_p50_ms: 200
-    latency_p95_ms: 500
-    observability:
-      tracing: true
-      metrics: true
-    security:
-      auth_required: true
-      pii_in_csv: true
-
-  backward_compatibility:
-    strategy: "Additive change; no existing endpoints modified"
-    notes:
-      - "No change to existing customer list API"
-
-  rollback_strategy:
-    approach: "Deploy behind feature flag; disable flag to rollback"
-    db_rollback_required: false
+  execution_spec:
+    overview: "Add GET /api/customers/export with CSV output and optional filters."
+    scope:
+      in: ["handler", "query validation", "CSV response"]
+      out: ["pagination", "UI changes"]
+    functional_requirements:
+      - "Return CSV for customer export."
+      - "Support optional date_from, date_to, status filters."
+    business_rules:
+      - "Invalid date range returns 400."
+      - "Invalid status returns 400."
+    edge_cases:
+      - "Empty result returns header-only CSV."
+    acceptance_criteria:
+      - "status=foo -> 400 validation error."
+      - "no filters -> 200 CSV."
+    test_scenarios:
+      - "happy path"
+      - "invalid status"
+      - "invalid date range"
+    non_functional_requirements:
+      latency_p95_ms: 500
+      observability:
+        tracing: true
+      security:
+        auth_required: true
+    rollout_and_rollback:
+      rollout: "Deploy behind feature flag."
+      rollback: "Disable feature flag."
+    open_questions: []
+    implementation_plan:
+      - "Add ListWithFilters to customer service"
+      - "Add export handler and route"
+      - "Wire validation and CSV writer"
 
 meta:
   eval:
-    backward_compatibility_checked: true
+    execution_spec_complete: true
     rollback_strategy_present: true
     non_functional_constraints_covered: true
 ```
@@ -283,7 +259,7 @@ output:
 
 meta:
   eval:
-    changed_files_aligned_with_plan: true
+    changed_files_aligned_with_execution_spec: true
 ```
 
 ---

@@ -1,6 +1,6 @@
 # Agent specs
 
-Pipeline role definitions for Researcher, Planner, Implementor, Tester, Reviewer, and Orchestrator. Each `*-agent.md` is the source of truth for that role.
+Pipeline role definitions for Researcher, Planner, Implementor, Tester, Reviewer, and Orchestrator. Planner produces the execution spec; downstream agents execute against the latest approved execution spec.
 
 ## Standards used
 
@@ -28,11 +28,11 @@ Use this when adding or editing agent specs. Standards: AGENTS.md (Agentic AI Fo
 
 | File | Purpose |
 |------|--------|
-| `researcher-agent.md` | Parse spec → requirements, impacted components, risks |
-| `planner-agent.md` | Research → API/DB plan, implementation steps |
-| `implementor-agent.md` | Plan → code + change report |
-| `tester-agent.md` | Implementor output → tests, coverage, risks |
-| `reviewer-agent.md` | Tester output → findings, merge readiness |
+| `researcher-agent.md` | Clarify requirement → constraints, impacted components, risks |
+| `planner-agent.md` | Research output → execution spec |
+| `implementor-agent.md` | Execution spec → code + implementation result |
+| `tester-agent.md` | Execution spec + implementation result → test result, risks |
+| `reviewer-agent.md` | Execution spec + test result → review findings, merge readiness |
 | `orchestrator-agent.md` | Routing, categories, loopbacks, quality gates |
 | `skills-map.md` | Agent → skills mapping (e.g. `analyze-requirement`, `implement-go-handler`) |
 | `examples.md` | Full pipeline walkthroughs |

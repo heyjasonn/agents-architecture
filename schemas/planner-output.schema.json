@@ -12,52 +12,37 @@
     "output": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "architecture_overview",
-        "request_flow",
-        "api_contract",
-        "db_changes",
-        "implementation_steps",
-        "constraints",
-        "assumptions"
-      ],
+      "required": ["execution_spec"],
       "properties": {
-        "architecture_overview": { "type": "string" },
-        "request_flow": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "api_contract": {
+        "execution_spec": {
           "type": "object",
-          "additionalProperties": true
-        },
-        "db_changes": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "implementation_steps": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "constraints": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "assumptions": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "non_functional_requirements": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "backward_compatibility": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "rollback_strategy": {
-          "type": "object",
-          "additionalProperties": true
+          "additionalProperties": false,
+          "required": [
+            "overview",
+            "scope",
+            "functional_requirements",
+            "business_rules",
+            "edge_cases",
+            "acceptance_criteria",
+            "test_scenarios",
+            "non_functional_requirements",
+            "rollout_and_rollback",
+            "open_questions",
+            "implementation_plan"
+          ],
+          "properties": {
+            "overview": { "type": "string" },
+            "scope": { "type": "object", "additionalProperties": true },
+            "functional_requirements": { "type": "array", "items": { "type": "string" } },
+            "business_rules": { "type": "array", "items": { "type": "string" } },
+            "edge_cases": { "type": "array", "items": { "type": "string" } },
+            "acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+            "test_scenarios": { "type": "array", "items": { "type": "string" } },
+            "non_functional_requirements": { "type": "object", "additionalProperties": true },
+            "rollout_and_rollback": { "type": "array", "items": { "type": "string" } },
+            "open_questions": { "type": "array", "items": { "type": "string" } },
+            "implementation_plan": { "type": "array", "items": { "type": "string" } }
+          }
         }
       }
     },

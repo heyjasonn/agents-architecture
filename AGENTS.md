@@ -1,6 +1,6 @@
 ## Agent instructions
 
-This repo defines a **multi-agent pipeline** (requirements → research → plan → implementation → test → review). Use these instructions when working as or with these agents. Build, test, and code-style rules live in the codebase where the pipeline runs; role contracts and handoffs are in `agents/`.
+This repo defines a **multi-agent pipeline** (requirements → research → execution spec → implementation → test → review). Use these instructions when working as or with these agents. Build, test, and code-style rules live in the codebase where the pipeline runs; role contracts and handoffs are in `agents/`.
 
 ### Where to look
 
@@ -24,7 +24,17 @@ This repo defines a **multi-agent pipeline** (requirements → research → plan
 - **Invocation shape:** All role agents receive a **JSON/YAML object**, not free-form text. The runner MUST:
   - Wrap inputs under a top-level `task` key.
   - Attach `state` from previous steps.
-  - Attach previous `handoff_outputs` when present.
+  - Attach previous `handoff_outputs` and latest artifacts when present.
+- **Artifact flow:** Runtime artifacts are produced and consumed in order:
+  - `research_artifact` (Researcher output; clarified problem, constraints, open questions)
+  - `execution_spec` (Planner output; primary downstream contract)
+  - `implementation_result` (Implementor output against latest approved `execution_spec`)
+  - `test_result` (Tester output against latest approved `execution_spec`)
+  - `review_result` (Reviewer output against latest approved `execution_spec`)
+- **Source of truth:**
+  - `task.requirement` is the initial input only.
+  - For downstream execution, the latest approved `execution_spec` is the source of truth.
+  - Implementor, Tester, and Reviewer MUST follow the latest approved `execution_spec` and must not reinterpret the raw requirement directly.
 - **Agent outputs:** Must be valid **YAML or JSON** with:
   - Top-level `task_id`
   - Top-level `agent` (one of `researcher|planner|implementor|tester|reviewer|orchestrator`)
@@ -44,7 +54,7 @@ Multi-agent runs share a small, explicit state object to avoid stale handoffs:
   - `task_id` — unique per orchestrated run.
   - `requirement_version` — bumped when requirement/clarifications change.
   - `research_version` — bumped when Researcher re-runs.
-  - `plan_version` — bumped when Planner re-runs.
+  - `execution_spec_version` — bumped when Planner re-runs.
   - `implementation_version` — bumped when Implementor re-runs.
   - `test_version` — bumped when Tester re-runs.
   - `review_version` — bumped when Reviewer re-runs.
@@ -65,11 +75,11 @@ For production use, each role should be evaluated with simple, explicit rubrics:
   - `risk_coverage_score` (0–1)
   - `open_questions_blocking` (bool)
 - **Planner**
-  - `backward_compatibility_checked` (bool)
+  - `execution_spec_complete` (bool)
   - `rollback_strategy_present` (bool)
   - `non_functional_constraints_covered` (bool; latency, observability, security, scalability where relevant)
 - **Implementor**
-  - `changed_files_aligned_with_plan` (bool)
+  - `changed_files_aligned_with_execution_spec` (bool)
   - `tests_required_before_review` (bool)
 - **Tester**
   - `critical_scenarios_covered` (bool)
@@ -86,7 +96,7 @@ These can be stored in `output.meta.eval` per agent for downstream dashboards or
 - **Per-agent span attributes:**
   - `agent.name`, `agent.role`
   - `task.id`, `task.category`
-  - `state.version.*` (requirement/plan/implementation/etc.)
+  - `state.version.*` (requirement/research/execution_spec/implementation/test/review)
   - `token.usage.prompt`, `token.usage.completion` (if available)
   - `tools.used` (list of tool names)
   - `retry.count`
@@ -108,7 +118,7 @@ These can be stored in `output.meta.eval` per agent for downstream dashboards or
 ### Ambiguity and human-in-the-loop
 
 - **Ambiguity threshold:**
-  - If a role agent has blocking open questions that prevent a safe plan or implementation, it MUST:
+  - If a role agent has blocking open questions that prevent a safe execution spec or implementation, it MUST:
     - Populate `open_questions` (Researcher/Planner) or `blocking_issues` (Tester/Reviewer).
     - Mark `current_status = blocked`.
     - Return control to Orchestrator to either loop back or escalate.
@@ -120,7 +130,7 @@ These can be stored in `output.meta.eval` per agent for downstream dashboards or
 
 ### Handoff order
 
-Researcher → Planner → Implementor → Tester → Reviewer. Loopbacks and quality gates are in the orchestrator; no step skips required outputs.
+Researcher → Planner → Implementor → Tester → Reviewer. Planner must publish an `execution_spec` before downstream execution; loopbacks and quality gates are in the orchestrator; no step skips required outputs.
 
 ### When stuck
 
