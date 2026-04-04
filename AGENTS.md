@@ -7,7 +7,7 @@ This repo defines a **multi-agent pipeline** (requirements → research → exec
 - **Role specs:** `agents/*-agent.md` — one file per role (Researcher, Planner, Implementor, Tester, Reviewer). Each defines responsibilities, contracts, and guardrails.
 - **Orchestrator:** `agents/orchestrator-agent.md` — handoff order, loopbacks, routing, categories, validation examples.
 - **Skills map:** `agents/skills-map.md` — which skills each agent uses (e.g. `implement-go-handler`, `write-unit-test-go`).
-- **Examples:** `agents/examples.md` — full pipeline walkthroughs (new feature, bugfix, loopback).
+- **Examples:** `agents/examples.md` — full pipeline walkthroughs (new feature, bugfix, loopback, optional Planner `technical_illustrations`).
 - **Agent specs meta:** `agents/README.md` — standards, verification checklist, file map.
 - **State model:** `agents/state-model.md` — shared state, versioning, blocking issues.
 - **Evals:** `agents/evals.md` — role-level eval rubrics and metrics.
@@ -27,13 +27,14 @@ This repo defines a **multi-agent pipeline** (requirements → research → exec
   - Attach previous `handoff_outputs` and latest artifacts when present.
 - **Artifact flow:** Runtime artifacts are produced and consumed in order:
   - `research_artifact` (Researcher output; clarified problem, constraints, open questions)
-  - `execution_spec` (Planner output; primary downstream contract)
+  - `execution_spec` (Planner output; primary downstream contract; may include optional `technical_illustrations` / `implementation_sketches` as explanatory aids only—see **Source of truth** below)
   - `implementation_result` (Implementor output against latest approved `execution_spec`)
   - `test_result` (Tester output against latest approved `execution_spec`)
   - `review_result` (Reviewer output against latest approved `execution_spec`)
 - **Source of truth:**
   - `task.requirement` is the initial input only.
-  - For downstream execution, the latest approved `execution_spec` is the source of truth.
+  - For downstream execution, the latest approved `execution_spec` is the source of truth. Explicit written sections (functional requirements, business rules, acceptance criteria, edge cases, and related contract fields) are authoritative—not optional snippets alone.
+  - Optional `execution_spec.technical_illustrations` / `execution_spec.implementation_sketches` (if present) are lightweight, explanatory aids only: not production-ready implementation and not a substitute for explicit requirements in those written sections; if a snippet conflicts with explicit written requirements, the written spec wins.
   - Implementor, Tester, and Reviewer MUST follow the latest approved `execution_spec` and must not reinterpret the raw requirement directly.
 - **Agent outputs:** Must be valid **YAML or JSON** with:
   - Top-level `task_id`

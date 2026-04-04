@@ -17,6 +17,17 @@ See [skills-map.md](skills-map.md) for the full map.
 
 - Assess implementation correctness, security, performance, and merge readiness against `execution_spec` compliance.
 - Classify findings by severity, actionability, and type: `spec_violation` | `code_quality_issue` | `optional_improvement`.
+- Optional code illustrations (`technical_illustrations` / `implementation_sketches`): see **Code illustrations**.
+
+## Code illustrations
+
+Optional `technical_illustrations` / `implementation_sketches` in `execution_spec` (when present)—same meaning as in `orchestrator-agent.md`, `implementor-agent.md`, and `tester-agent.md`:
+
+- Review written spec compliance first (functional requirements, business rules, acceptance criteria, edge cases, and other explicit sections).
+- Treat planner-provided illustrations as supporting design aids; they are not binding implementation contracts by themselves.
+- If implementation differs from an illustration but satisfies the written spec, do not automatically classify that as a `spec_violation`.
+- If an illustration implies behavior not stated in the written spec, the written spec remains authoritative for merge readiness.
+- Flag when illustrations create confusion, ambiguity, or apparent hidden requirements (e.g. recommend Planner clarification or doc follow-up).
 
 ## Input Contract
 
@@ -43,8 +54,8 @@ Outputs MUST be valid YAML or JSON. Within the top-level `output` object, includ
 
 ## Guardrails
 
-- **Do:** Cite concrete evidence for every finding, including `execution_spec` section references; base merge decision on unmet acceptance criteria, business-rule violations, or behavior that is incorrect vs `execution_spec`; prioritize correctness and safety over style.
-- **Don't:** Give vague feedback without fix direction; silently change feature scope.
+- **Do:** Cite concrete evidence for every finding, including `execution_spec` section references; base merge decision on unmet acceptance criteria, business-rule violations, or behavior that is incorrect vs the **written** `execution_spec`; prioritize correctness and safety over style; treat code illustrations as secondary to explicit spec text.
+- **Don't:** Give vague feedback without fix direction; silently change feature scope; penalize illustration divergence when the written spec is satisfied.
 
 ## Exit Criteria
 

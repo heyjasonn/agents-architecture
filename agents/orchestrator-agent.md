@@ -7,7 +7,7 @@ description: Assigns requirements to role agents, enforces handoff order, and de
 
 ## Mission
 
-Assigns a requirement to role agents (Researcher → Planner → Implementor → Tester → Reviewer), enforces spec-first handoff order, and decides when loops/escalations are required.
+Assigns a requirement to role agents (Researcher → Planner → Implementor → Tester → Reviewer), enforces spec-first handoff order (explicit written `execution_spec` sections over optional `technical_illustrations` / `implementation_sketches`), and decides when loops/escalations are required.
 
 ## Decision Boundary
 
@@ -94,14 +94,14 @@ Within `output`, required keys by step (see each role spec for full descriptions
 | Step | Required keys (from role spec) |
 |------|-------------------------------|
 | Researcher | `problem_summary`, `requirements`, `impacted_components`, `dependencies`, `edge_cases`, `risks`, `open_questions`, `test_scenarios`, `facts`, `assumptions`, `risk_summary` |
-| Planner | `execution_spec` with: `overview`, `scope`, `functional_requirements`, `business_rules`, `edge_cases`, `acceptance_criteria`, `test_scenarios`, `non_functional_requirements`, `rollout_and_rollback`, `open_questions`, `implementation_plan` |
+| Planner | `execution_spec` with: `overview`, `scope`, `functional_requirements`, `business_rules`, `edge_cases`, `acceptance_criteria`, `test_scenarios`, `non_functional_requirements`, `rollout_and_rollback`, `open_questions`, `implementation_plan`; optional `technical_illustrations` or `implementation_sketches` (explanatory aids only; see **Quality Gates**) |
 | Implementor | `changed_files`, `implemented_rules`, `known_limitations`, `areas_needing_tests`, `integration_points`, `tests_required_before_review`, `migrations_applied`, `config_changes`, `feature_flags_used` |
 | Tester | `tests_added`, `covered_scenarios`, `uncovered_scenarios`, `observed_risks`, `test_matrix`, `regression_risk_level` |
 | Reviewer | `critical_issues`, `improvements`, `security_findings`, `performance_findings`, `merge_readiness`, `blocking_reasons`, `evidence`, `recommended_owner`, `required_followups_after_merge` |
 
 ## Context forwarding and pruning
 
-The orchestrator must **prune** context to only what the next role needs:
+The orchestrator must **prune** context to only what the next role needs. Optional `technical_illustrations` / `implementation_sketches` inside `execution_spec` travel with the spec as explanatory aids only; written requirements, business rules, acceptance criteria, and edge cases remain authoritative (see **Quality Gates**).
 
 - **Researcher → Planner**
   - Forward: Researcher `output` only (plus `requirement` text).
@@ -117,6 +117,9 @@ For all steps, keep a separate internal log/trace store; do **not** embed large 
 
 ## Quality Gates
 
+- `execution_spec` is the required downstream artifact. Optional `technical_illustrations` / `implementation_sketches` are allowed only as explanatory aids; they must not be treated as implementation mandates or as a substitute for missing requirements.
+- Treat written spec sections as the primary source of truth. If code illustrations conflict with explicit functional requirements, business rules, acceptance criteria, or edge cases, the written spec takes precedence.
+- Planner gate quality remains anchored on: `functional_requirements`, `business_rules`, `acceptance_criteria`, `edge_cases`, and blocker-level items in `open_questions`—not on the presence or richness of code illustrations.
 - No step advances without required output keys.
 - No downstream execution starts without an approved `execution_spec`.
 - Planner output must include `execution_spec.functional_requirements`, `execution_spec.business_rules`, `execution_spec.acceptance_criteria`, and `execution_spec.edge_cases`.

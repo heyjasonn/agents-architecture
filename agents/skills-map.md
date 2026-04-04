@@ -45,6 +45,7 @@ Each agent invokes one or more **skills** to fulfill its responsibilities. Skill
 - **design-api-contract** — Endpoints, payloads, status codes.
 - **design-db-migration** — Schema changes, migration strategy, rollback.
 - **create-implementation-plan** — Ordered implementation steps and assumptions.
+- Optional `output.execution_spec.technical_illustrations` / `implementation_sketches` (lightweight, explanatory snippets) are defined in `planner-agent.md`, not as separate skills here.
 
 ### Implementor
 

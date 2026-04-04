@@ -60,6 +60,7 @@ meta:
 
 - **`execution_spec_complete`**
   - `true`: `execution_spec` includes functional requirements, business rules, edge cases, acceptance criteria, test scenarios, and rollout/rollback.
+  - Optional `technical_illustrations` / `implementation_sketches` do not satisfy completeness by themselves; they are supplementary only and must not replace those written sections.
 - **`rollback_strategy_present`**
   - `true`: `execution_spec.rollout_and_rollback` is present and realistic.
 - **`non_functional_constraints_covered`**

@@ -1,6 +1,6 @@
 # Multi-agent pipeline examples
 
-Concrete examples of how a requirement flows through Researcher → Planner → Implementor → Tester → Reviewer in a spec-driven workflow. Use these to see the **shape of each handoff** and when **loopbacks** happen.
+Concrete examples of how a requirement flows through Researcher → Planner → Implementor → Tester → Reviewer in a spec-driven workflow. Use these to see the **shape of each handoff** and when **loopbacks** happen. **Example 5** shows a Planner `execution_spec` with optional `technical_illustrations` (written spec remains the contract).
 
 ---
 
@@ -665,4 +665,83 @@ output:
     - "implementor"
   required_followups_after_merge:
     - "Add analytics dashboard for package usage burn-down per recruiter."
+```
+
+---
+
+## Example 5: Planner execution spec with optional code illustrations
+
+**User requirement:**  
+"After a subscription renewal succeeds, emit a `subscription.renewed` domain event so analytics and search indexers can react. Duplicates for the same billing period must not produce duplicate downstream effects."
+
+This example shows a **Planner-only** handoff shape: the **written** `execution_spec` sections are the downstream contract; `technical_illustrations` is optional, explanatory, and not a substitute for explicit requirements.
+
+**Output (handoff to Implementor, full artifact envelope):**
+
+```yaml
+task_id: "T-SUB-RENEW-EVT-001"
+agent: "planner"
+version: 1
+
+output:
+  execution_spec:
+    overview: "Publish a renewal event after successful subscription renewal with idempotency per renewal attempt."
+    scope:
+      in: ["renewal success path", "event publish to internal broker", "idempotency by renewal_id"]
+      out: ["payment processor UI", "customer email notifications"]
+    functional_requirements:
+      - "On successful renewal transaction completion, publish subscription.renewed including subscription_id, renewal_id, and renewed_at."
+      - "Publishing uses the platform event bus; consumers are out of scope except as noted in scope."
+    business_rules:
+      - "The same renewal_id must not produce more than one subscription.renewed emission (idempotent publisher)."
+      - "renewed_at must reflect the billing-system completion timestamp, not client clock."
+    edge_cases:
+      - "Broker temporarily unavailable: publisher retries with backoff; no silent drop of a successful renewal."
+      - "Replay of the same renewal_id after success: no second event."
+    acceptance_criteria:
+      - "Given renewal_id R1 applied once, exactly one subscription.renewed with renewal_id R1 is observed on the bus."
+      - "Given two different renewal_ids for the same subscription in different periods, two distinct events are emitted."
+    test_scenarios:
+      - "Happy path: renewal completes, one event emitted."
+      - "Duplicate publish attempt for same renewal_id: second is a no-op."
+      - "Broker failure: event appears after retry without duplicate side effects."
+    non_functional_requirements:
+      - "Emit within 5s p95 of renewal commit; structured logs with renewal_id and subscription_id."
+    rollout_and_rollback:
+      - "Feature-flag the publisher; rollback disables flag (no schema removal in v1)."
+    open_questions: []
+    implementation_plan:
+      - "Add outbox or idempotency store keyed by renewal_id before publish."
+      - "Wire renewal success handler to publisher."
+      - "Add integration test: single emission + retry semantics."
+
+    technical_illustrations:
+      - purpose: "Example payload shape for integrators (not a schema registry contract)."
+        snippet_type: "event_payload_example"
+        snippet: |
+          {
+            "type": "subscription.renewed",
+            "renewal_id": "ren_01H...",
+            "subscription_id": "sub_01H...",
+            "renewed_at": "2026-04-02T12:00:00Z"
+          }
+        notes: "Illustrative JSON only. Binding field requirements and idempotency rules are in functional_requirements and business_rules above."
+        constraints: "Implementor must not treat keys or formatting as authoritative without matching written spec."
+
+      - purpose: "Pseudocode sketch for idempotent publish (not production logic)."
+        snippet_type: "pseudocode"
+        snippet: |
+          on renewal_success(renewal_id):
+            if already_emitted(renewal_id): return ok
+            mark_pending_emit(renewal_id)
+            publish(build_event(renewal_id))  // see business_rules for duplicate rules
+            mark_emitted(renewal_id)
+        notes: "Explanatory flow only; transaction boundaries and storage belong to implementation_plan and repo standards."
+        constraints: "If this sketch conflicts with written edge_cases or business_rules, the written spec wins."
+
+meta:
+  eval:
+    execution_spec_complete: true
+    rollback_strategy_present: true
+    non_functional_constraints_covered: true
 ```
